@@ -1,0 +1,28 @@
+{
+  "name": "izumi",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
+  },
+  "dependencies": {
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "@discordjs/voice": "^0.7.5",
+    "bufferutil": "^4.0.5",
+    "discord-api-types": "^0.25.2",
+    "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0",
+    "erlpack": "^0.1.3",
+    "tweetnacl": "^1.0.3",
+    "utf-8-validate": "^5.0.7",
+    "youtube-dl-exec": "^2.0.2",
+    "ytdl-core": "^4.9.2",
+    "zlib-sync": "^0.1.7"
+  },
+  "devDependencies": {
+    "ts-node": "^10.4.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.5.2"
+  }
+}
