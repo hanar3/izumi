@@ -13,11 +13,14 @@ import MusicPlayer from "../utils/MusicPlayer";
 import { AppError } from "../error/AppError";
 import { InvalidArgsError } from "../error/InvalidArgsError";
 import ytsr from "ytsr";
+import { CommandManager } from "../managers/CommandManager";
 export class PlayCommand implements BaseCommand {
   static command = "play";
   static aliases = ["p", "pl"];
   static usage = "`!play <url>`";
   static description = "Plays the specified song";
+
+  manager: CommandManager;
 
   constructor(private message: Message, private args: string[]) {}
 

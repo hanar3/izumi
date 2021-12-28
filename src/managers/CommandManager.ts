@@ -5,14 +5,8 @@ import { AppError } from "../error/AppError";
 import { InvalidArgsError } from "../error/InvalidArgsError";
 
 interface Constructable<T extends BaseCommand> {
-  command: string;
-  aliases: string[];
   new (...args: any): T;
 }
-
-const commandByName: { [key: string]: Constructable<BaseCommand> } = {
-  "!play": PlayCommand,
-};
 
 export class CommandManager {
   commands: Collection<string, Constructable<BaseCommand>> = new Collection();
@@ -39,6 +33,7 @@ export class CommandManager {
 
     try {
       const cmd = new cmdRef(message, args);
+      cmd.manager = this;
       await cmd.execute();
     } catch (err) {
       if (err instanceof AppError) {
