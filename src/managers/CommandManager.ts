@@ -3,8 +3,9 @@ import { BaseCommand } from "../commands/BaseCommand";
 import { PlayCommand } from "../commands/Play";
 import { AppError } from "../error/AppError";
 import { InvalidArgsError } from "../error/InvalidArgsError";
-
 interface Constructable<T extends BaseCommand> {
+  command: string;
+  aliases: string[];
   new (...args: any): T;
 }
 

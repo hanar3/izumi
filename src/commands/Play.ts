@@ -14,6 +14,7 @@ import { AppError } from "../error/AppError";
 import { InvalidArgsError } from "../error/InvalidArgsError";
 import ytsr from "ytsr";
 import { CommandManager } from "../managers/CommandManager";
+import { redis } from "../utils/redis";
 export class PlayCommand implements BaseCommand {
   static command = "play";
   static aliases = ["p", "pl"];
@@ -47,31 +48,40 @@ export class PlayCommand implements BaseCommand {
     return connection;
   }
 
-  private async enqueueSong() {
-    let resourceToPlay = this.args.join(" ");
-    let url = resourceToPlay;
+  private async search() {
+    const searchTerms = this.args.join(" ");
+    const cachedURL = await redis.get(searchTerms);
 
-    if (!url.startsWith("http")) {
-      url = "";
+    if (cachedURL) return cachedURL;
 
-      const filters = await ytsr.getFilters(resourceToPlay);
+    this.message.reply("Searching for song...");
 
-      if (filters) {
-        const filteredUrl = filters?.get("Type")?.get("Video")?.url;
-        if (!filteredUrl) throw new AppError("Could not build filter url");
-        const { items } = await ytsr(filteredUrl, { limit: 10 });
-        console.log({ items });
-        for (const item of items) {
-          if (item.type === `video`) {
-            url = item.url;
-            break;
-          }
+    const filters = await ytsr.getFilters(searchTerms);
+    let url = "";
+    if (filters) {
+      const filteredUrl = filters?.get("Type")?.get("Video")?.url;
+      if (!filteredUrl) throw new AppError("Could not build filter url");
+      const { items } = await ytsr(filteredUrl, { limit: 10 });
+      for (const item of items) {
+        if (item.type === `video`) {
+          url = item.url;
+          break;
         }
       }
     }
 
-    if (!url) throw new AppError("Could not find a link to this song");
-    console.log({ url: resourceToPlay });
+    if (!url) throw new AppError("Could not find song " + searchTerms);
+
+    await redis.set(searchTerms, url);
+    return url;
+  }
+
+  private async enqueueSong() {
+    let url = this.args.join(" ");
+    if (!url.startsWith("http")) {
+      // If it`s not a link, it`s probably a song title, so search for the link
+      url = await this.search();
+    }
 
     const track = await this.createTrack(url);
     MusicPlayer.enqueue(track);

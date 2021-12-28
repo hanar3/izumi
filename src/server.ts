@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { Client, Intents, Message } from "discord.js";
-import { PlayCommand } from "./commands/Play";
+import { redis } from "./utils/redis";
 import { CommandManager } from "./managers/CommandManager";
 
 const client = new Client({
@@ -12,7 +12,8 @@ const client = new Client({
   ],
 });
 
-client.once("ready", () => {
+client.once("ready", async () => {
+  await redis.connect();
   console.log("Ready!");
 });
 

@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add youtube-dl-exec
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add redis
 
 PATH: 
   C:\Program Files\PowerShell\7-preview;C:\Program Files\AdoptOpenJDK\jdk-11.0.8.10-hotspot\bin;C:\Program Files\Yori;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Python27\;C:\Python27\Scripts;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\vitor\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\PowerShell\7-preview\preview;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\CMake\bin;C:\Program Files\PuTTY\;C:\Go\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PowerShell\7-preview;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Users\vitor\AppData\Local\Programs\Python\Python39\Scripts\;C:\Users\vitor\AppData\Local\Programs\Python\Python39\;C:\Users\vitor\scoop\shims;C:\Users\vitor\.cargo\bin;C:\Users\vitor\AppData\Local\Microsoft\WindowsApps;C:\Users\vitor\.deno\bin;C:\Users\vitor\AppData\Local\Programs\Microsoft VS Code\bin;c:\Users\Vitor\AppData\Local\Android\Sdk\platform-tools;C:\Users\vitor\AppData\Roaming\nvm\v10.15.0;C:\Users\vitor\AppData\Local\Yarn\bin;C:\Program Files\Java\jdk1.8.0_241\bin;C:\src\flutter\bin;C:\src\genie;C:\src\ngrok;C:\Program Files\OpenSSL-Win64\bin;C:\Program Files\JetBrains\CLion 2020.2.3\bin;D:\MinGW\bin;C:\Users\vitor\go\bin;C:\src\ffmpeg\bin;C:\Program Files (x86)\GnuWin32\bin;C:\Users\vitor\AppData\Local\Microsoft\WindowsApps;C:\src\hasura;C:\Users\vitor\AppData\Roaming\Flow;C:\Users\vitor\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin;C:\src\glide;C:\src\geth
@@ -28,6 +28,7 @@ npm manifest:
     "dependencies": {
       "@discordjs/rest": "^0.1.0-canary.0",
       "@discordjs/voice": "^0.7.5",
+      "@types/node": "^17.0.5",
       "bufferutil": "^4.0.5",
       "discord-api-types": "^0.25.2",
       "discord.js": "^13.3.1",
@@ -35,7 +36,9 @@ npm manifest:
       "erlpack": "^0.1.3",
       "tweetnacl": "^1.0.3",
       "utf-8-validate": "^5.0.7",
+      "youtube-dl-exec": "^2.0.2",
       "ytdl-core": "^4.9.2",
+      "ytsr": "^3.5.3",
       "zlib-sync": "^0.1.7"
     },
     "devDependencies": {
@@ -121,6 +124,23 @@ Lockfile:
       tslib "^2.3.1"
       ws "^8.2.3"
   
+  "@prisma/client@^3.7.0":
+    version "3.7.0"
+    resolved "https://registry.yarnpkg.com/@prisma/client/-/client-3.7.0.tgz#9cafc105f12635c95e9b7e7b18e8fbf52cf3f18a"
+    integrity sha512-fUJMvBOX5C7JPc0e3CJD6Gbelbu4dMJB4ScYpiht8HMUnRShw20ULOipTopjNtl6ekHQJ4muI7pXlQxWS9nMbw==
+    dependencies:
+      "@prisma/engines-version" "3.7.0-31.8746e055198f517658c08a0c426c7eec87f5a85f"
+  
+  "@prisma/engines-version@3.7.0-31.8746e055198f517658c08a0c426c7eec87f5a85f":
+    version "3.7.0-31.8746e055198f517658c08a0c426c7eec87f5a85f"
+    resolved "https://registry.yarnpkg.com/@prisma/engines-version/-/engines-version-3.7.0-31.8746e055198f517658c08a0c426c7eec87f5a85f.tgz#055f36ac8b06c301332c14963cd0d6c795942c90"
+    integrity sha512-+qx2b+HK7BKF4VCa0LZ/t1QCXsu6SmvhUQyJkOD2aPpmOzket4fEnSKQZSB0i5tl7rwCDsvAiSeK8o7rf+yvwg==
+  
+  "@prisma/engines@3.7.0-31.8746e055198f517658c08a0c426c7eec87f5a85f":
+    version "3.7.0-31.8746e055198f517658c08a0c426c7eec87f5a85f"
+    resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-3.7.0-31.8746e055198f517658c08a0c426c7eec87f5a85f.tgz#12f28d5b78519fbd84c89a5bdff457ff5095e7a2"
+    integrity sha512-W549ub5NlgexNhR8EFstA/UwAWq3Zq0w9aNkraqsozVCt2CsX+lK4TK7IW5OZVSnxHwRjrgEAt3r9yPy8nZQRg==
+  
   "@sapphire/async-queue@^1.1.4", "@sapphire/async-queue@^1.1.8":
     version "1.1.9"
     resolved "https://registry.yarnpkg.com/@sapphire/async-queue/-/async-queue-1.1.9.tgz#ce69611c8753c4affd905a7ef43061c7eb95c01b"
@@ -168,6 +188,11 @@ Lockfile:
     version "16.11.11"
     resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.11.tgz#6ea7342dfb379ea1210835bada87b3c512120234"
     integrity sha512-KB0sixD67CeecHC33MYn+eYARkqTheIRNuu97y2XMjR7Wu3XibO1vaY6VBV6O/a89SPI81cEUIYT87UqUWlZNw==
+  
+  "@types/node@^17.0.5":
+    version "17.0.5"
+    resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.5.tgz#57ca67ec4e57ad9e4ef5a6bab48a15387a1c83e0"
+    integrity sha512-w3mrvNXLeDYV1GKTZorGJQivK6XLCoGwpnyJFbJVK/aTBQUxOCaa/GlFAAN3OTDFcb7h5tiFG+YXCO2By+riZw==
   
   "@types/strip-bom@^3.0.0":
     version "3.0.0"
@@ -588,7 +613,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-2.1.0.tgz#7ed2c2ccccaf84d3ffcb7a69b57711fc2083401b"
     integrity sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==
   
-  miniget@^4.0.0:
+  miniget@^4.0.0, miniget@^4.2.1:
     version "4.2.1"
     resolved "https://registry.yarnpkg.com/miniget/-/miniget-4.2.1.tgz#11a1c24817a059e292378eb9cff4328d9240c665"
     integrity sha512-O/DduzDR6f+oDtVype9S/Qu5hhnx73EDYGyZKwU/qN82lehFZdfhoa4DT51SpsO+8epYrB3gcRmws56ROfTIoQ==
@@ -689,6 +714,13 @@ Lockfile:
     version "1.3.2"
     resolved "https://registry.yarnpkg.com/prism-media/-/prism-media-1.3.2.tgz#a1f04423ec15d22f3d62b1987b6a25dc49aad13b"
     integrity sha512-L6UsGHcT6i4wrQhFF1aPK+MNYgjRqR2tUoIqEY+CG1NqVkMjPRKzS37j9f8GiYPlD6wG9ruBj+q5Ax+bH8Ik1g==
+  
+  prisma@^3.7.0:
+    version "3.7.0"
+    resolved "https://registry.yarnpkg.com/prisma/-/prisma-3.7.0.tgz#9c73eeb2f16f767fdf523d0f4cc4c749734d62e2"
+    integrity sha512-pzgc95msPLcCHqOli7Hnabu/GRfSGSUWl5s2P6N13T/rgMB+NNeKbxCmzQiZT2yLOeLEPivV6YrW1oeQIwJxcg==
+    dependencies:
+      "@prisma/engines" "3.7.0-31.8746e055198f517658c08a0c426c7eec87f5a85f"
   
   readdirp@~3.6.0:
     version "3.6.0"
@@ -936,6 +968,13 @@ Lockfile:
       m3u8stream "^0.8.4"
       miniget "^4.0.0"
       sax "^1.1.3"
+  
+  ytsr@^3.5.3:
+    version "3.5.3"
+    resolved "https://registry.yarnpkg.com/ytsr/-/ytsr-3.5.3.tgz#88e8e2df11ce53c28b456b5510272495cb42ac3a"
+    integrity sha512-BEyIKbQULmk27hiVUQ1cBszAqP8roPBOQTWPZpBioKxjSZBeicfgF2qPIQoY7koodQwRuo1DmCFz3DyrXjADxg==
+    dependencies:
+      miniget "^4.2.1"
   
   zlib-sync@^0.1.7:
     version "0.1.7"
