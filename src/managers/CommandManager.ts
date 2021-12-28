@@ -1,7 +1,5 @@
 import { Message, Collection } from "discord.js";
-import fs from "fs";
-import { resolve } from "path";
-import { BaseCommand } from "../commands/ICommand";
+import { BaseCommand } from "../commands/BaseCommand";
 import { PlayCommand } from "../commands/Play";
 import { AppError } from "../error/AppError";
 import { InvalidArgsError } from "../error/InvalidArgsError";
