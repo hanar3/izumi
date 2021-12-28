@@ -6,6 +6,7 @@ import {
   entersState,
   VoiceConnection,
   VoiceConnectionDisconnectReason,
+  VoiceConnectionState,
   VoiceConnectionStatus,
 } from "@discordjs/voice";
 import { Track } from "./Track";
@@ -32,6 +33,7 @@ class MusicPlayer {
         // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
         // The queue is then processed to start playing the next track, if one is available.
         (oldState.resource as AudioResource<Track>).metadata.onFinish();
+        this.queue.shift();
         void this.processQueue();
       } else if (newState.status === AudioPlayerStatus.Playing) {
         // If the Playing state has been entered, then a new track has started playback.
@@ -41,8 +43,8 @@ class MusicPlayer {
   }
 
   handleConnectionStateChange = async (
-    _: any,
-    newState: { status: any; reason: any; closeCode: number }
+    _: VoiceConnectionState,
+    newState: VoiceConnectionState
   ) => {
     if (!this.voiceConnection) return;
 
@@ -102,10 +104,12 @@ class MusicPlayer {
   setVoiceConnection(connection: VoiceConnection) {
     this.voiceConnection = connection;
     this.voiceConnection.subscribe(this.player);
+    this.voiceConnection.on("stateChange", this.handleConnectionStateChange);
   }
 
   async enqueue(track: Track) {
     this.queue.push(track);
+    track.onEnqueue(this.queue);
     await this.processQueue();
   }
 
@@ -125,7 +129,7 @@ class MusicPlayer {
     this.queueLock = true;
 
     // Take the first item from the queue. This is guaranteed to exist due to the non-empty check above.
-    const nextTrack = this.queue.shift()!;
+    const [nextTrack] = this.queue;
     try {
       // Attempt to convert the Track into an AudioResource (i.e. start streaming the video)
       const resource = await nextTrack.createAudioResource();

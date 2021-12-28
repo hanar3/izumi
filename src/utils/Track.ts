@@ -15,6 +15,7 @@ export interface TrackData {
   onStart: () => void;
   onFinish: () => void;
   onError: (error: Error) => void;
+  onEnqueue: (queue: Track[]) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -35,13 +36,22 @@ export class Track implements TrackData {
   public readonly onStart: () => void;
   public readonly onFinish: () => void;
   public readonly onError: (error: Error) => void;
+  public readonly onEnqueue: (queue: Track[]) => void;
 
-  private constructor({ url, title, onStart, onFinish, onError }: TrackData) {
+  private constructor({
+    url,
+    title,
+    onStart,
+    onFinish,
+    onError,
+    onEnqueue,
+  }: TrackData) {
     this.url = url;
     this.title = title;
     this.onStart = onStart;
     this.onFinish = onFinish;
     this.onError = onError;
+    this.onEnqueue = onEnqueue;
   }
 
   /**
@@ -100,7 +110,7 @@ export class Track implements TrackData {
    */
   public static async from(
     url: string,
-    methods: Pick<Track, "onStart" | "onFinish" | "onError">
+    methods: Pick<Track, "onStart" | "onFinish" | "onError" | "onEnqueue">
   ): Promise<Track> {
     const info = await getInfo(url);
 
@@ -117,6 +127,10 @@ export class Track implements TrackData {
       onError(error: Error) {
         wrappedMethods.onError = noop;
         methods.onError(error);
+      },
+      onEnqueue(queue: Track[]) {
+        wrappedMethods.onError = noop;
+        methods.onEnqueue(queue);
       },
     };
 
