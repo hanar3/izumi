@@ -1,23 +1,33 @@
 import { VoiceConnection } from "@discordjs/voice";
-import { Message, StageChannel, VoiceChannel } from "discord.js";
+import {
+  CommandInteractionOptionResolver,
+  Message,
+  StageChannel,
+  VoiceChannel,
+} from "discord.js";
 import { Track } from "../utils/Track";
-import { ICommand } from "./ICommand";
+import { BaseCommand } from "./BaseCommand";
 import { connectToChannel } from "../utils/connectToChannel";
 
 import MusicPlayer from "../utils/MusicPlayer";
 import { AppError } from "../error/AppError";
 import { InvalidArgsError } from "../error/InvalidArgsError";
-
-export class PlayCommand implements ICommand {
+import ytsr from "ytsr";
+export class PlayCommand implements BaseCommand {
+  static command = "play";
+  static aliases = ["p", "pl"];
   static usage = "`!play <url>`";
+  static description = "Plays the specified song";
 
-  constructor(private message: Message, private args: string) {}
+  constructor(private message: Message, private args: string[]) {}
 
   async execute() {
-    if (!this.args) throw new InvalidArgsError(PlayCommand.usage);
+    if (!this.args.length) throw new InvalidArgsError(PlayCommand.usage);
 
+    await this.enqueueSong();
     const connection = await this.joinVoiceChannel();
-    this.playSong(connection);
+    MusicPlayer.setVoiceConnection(connection);
+    MusicPlayer.subscribeVoiceConnection();
   }
 
   private async joinVoiceChannel(): Promise<VoiceConnection> {
@@ -25,6 +35,7 @@ export class PlayCommand implements ICommand {
 
     if (!channel) {
       // Disallow playing a song if user is not currently on a voice channel
+      MusicPlayer.stop();
       throw new AppError("Please join a voice channel first");
     }
 
@@ -33,8 +44,38 @@ export class PlayCommand implements ICommand {
     return connection;
   }
 
-  private async playSong(connection: VoiceConnection) {
-    const track = await Track.from(this.args, {
+  private async enqueueSong() {
+    let resourceToPlay = this.args.join(" ");
+    let url = resourceToPlay;
+
+    if (!url.startsWith("http")) {
+      url = "";
+
+      const filters = await ytsr.getFilters(resourceToPlay);
+
+      if (filters) {
+        const filteredUrl = filters?.get("Type")?.get("Video")?.url;
+        if (!filteredUrl) throw new AppError("Could not build filter url");
+        const { items } = await ytsr(filteredUrl, { limit: 10 });
+        console.log({ items });
+        for (const item of items) {
+          if (item.type === `video`) {
+            url = item.url;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!url) throw new AppError("Could not find a link to this song");
+    console.log({ url: resourceToPlay });
+
+    const track = await this.createTrack(url);
+    MusicPlayer.enqueue(track);
+  }
+
+  async createTrack(url: string) {
+    const track = await Track.from(url, {
       onStart: async () => {
         await this.message.reply(`Started playing ${track.title}`);
       },
@@ -54,7 +95,6 @@ export class PlayCommand implements ICommand {
         );
       },
     });
-    MusicPlayer.setVoiceConnection(connection);
-    MusicPlayer.enqueue(track);
+    return track;
   }
 }
