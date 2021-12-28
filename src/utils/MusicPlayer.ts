@@ -24,8 +24,6 @@ class MusicPlayer {
     this.player = createAudioPlayer();
 
     this.player.on("stateChange", (oldState, newState) => {
-      console.log({ oldState, newState });
-
       if (
         newState.status === AudioPlayerStatus.Idle &&
         oldState.status !== AudioPlayerStatus.Idle
@@ -103,6 +101,10 @@ class MusicPlayer {
 
   setVoiceConnection(connection: VoiceConnection) {
     this.voiceConnection = connection;
+  }
+
+  subscribeVoiceConnection() {
+    if (!this.voiceConnection) throw new Error("Did not set voice connection");
     this.voiceConnection.subscribe(this.player);
     this.voiceConnection.on("stateChange", this.handleConnectionStateChange);
   }
