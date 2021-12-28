@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { Client, Intents, Message } from "discord.js";
 import { PlayCommand } from "./commands/Play";
+import { CommandManager } from "./managers/CommandManager";
 
 const client = new Client({
   intents: [
@@ -16,17 +17,8 @@ client.once("ready", () => {
 });
 
 client.on("messageCreate", async (message: Message) => {
-  const prefix = "!";
-  if (message.content.startsWith(prefix)) {
-    const [command, args] = message.content.split(" ");
-
-    switch (command) {
-      case "!play":
-        const playCmd = new PlayCommand(message, args);
-        await playCmd.execute();
-        break;
-    }
-  }
+  const commandManager = new CommandManager();
+  await commandManager.execute(message);
 });
 
 client.login(process.env.DISCORD_TOKEN).then(() => console.log("Connected"));

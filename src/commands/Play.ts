@@ -5,26 +5,32 @@ import { ICommand } from "./ICommand";
 import { connectToChannel } from "../utils/connectToChannel";
 
 import MusicPlayer from "../utils/MusicPlayer";
+import { AppError } from "../error/AppError";
+import { InvalidArgsError } from "../error/InvalidArgsError";
 
 export class PlayCommand implements ICommand {
-  channel: VoiceChannel | StageChannel | null | undefined;
+  static usage = "`!play <url>`";
 
   constructor(private message: Message, private args: string) {}
 
   async execute() {
+    if (!this.args) throw new InvalidArgsError(PlayCommand.usage);
+
+    const connection = await this.joinVoiceChannel();
+    this.playSong(connection);
+  }
+
+  private async joinVoiceChannel(): Promise<VoiceConnection> {
     const channel = this.message.member?.voice.channel;
 
     if (!channel) {
       // Disallow playing a song if user is not currently on a voice channel
-      this.message.channel.send({
-        content: `${this.message.author} please join a voice channel before using !play`,
-      });
-      return;
+      throw new AppError("Please join a voice channel first");
     }
 
     const connection = await connectToChannel(channel);
 
-    this.playSong(connection);
+    return connection;
   }
 
   private async playSong(connection: VoiceConnection) {
