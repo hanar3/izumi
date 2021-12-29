@@ -59,7 +59,7 @@ export class PlayCommand implements BaseCommand {
 
     const search = await youtube.search.list({
       access_token: process.env.YOUTUBE_API_KEY,
-      part: ["id", "snippet"],
+      part: ["id"],
       q: query,
     });
 
