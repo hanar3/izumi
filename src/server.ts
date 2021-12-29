@@ -14,6 +14,15 @@ const client = new Client({
 
 client.once("ready", async () => {
   await redis.connect();
+  client.user?.setPresence({
+    activities: [
+      {
+        name: "@mochiko.jpg",
+        type: "WATCHING",
+        url: "http://instagram.com/mochiko.jpg",
+      },
+    ],
+  });
   console.log("Ready!");
 });
 
