@@ -1,10 +1,5 @@
 import { VoiceConnection } from "@discordjs/voice";
-import {
-  CommandInteractionOptionResolver,
-  Message,
-  StageChannel,
-  VoiceChannel,
-} from "discord.js";
+import { Message } from "discord.js";
 import { Track } from "../utils/Track";
 import { BaseCommand } from "./BaseCommand";
 import { connectToChannel } from "../utils/connectToChannel";
@@ -12,7 +7,6 @@ import { connectToChannel } from "../utils/connectToChannel";
 import MusicPlayer from "../utils/MusicPlayer";
 import { AppError } from "../error/AppError";
 import { InvalidArgsError } from "../error/InvalidArgsError";
-import ytsr from "ytsr";
 import { CommandManager } from "../managers/CommandManager";
 import { redis } from "../utils/redis";
 import { youtube } from "../utils/youtube";
