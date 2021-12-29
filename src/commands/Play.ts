@@ -15,6 +15,7 @@ import { InvalidArgsError } from "../error/InvalidArgsError";
 import ytsr from "ytsr";
 import { CommandManager } from "../managers/CommandManager";
 import { redis } from "../utils/redis";
+import { youtube } from "../utils/youtube";
 export class PlayCommand implements BaseCommand {
   static command = "play";
   static aliases = ["p", "pl"];
@@ -49,30 +50,32 @@ export class PlayCommand implements BaseCommand {
   }
 
   private async search() {
-    const searchTerms = this.args.join(" ");
-    const cachedURL = await redis.get(searchTerms);
+    const query = this.args.join(" ");
+    const cachedURL = await redis.get(query);
 
     if (cachedURL) return cachedURL;
 
     this.message.reply("Searching for song...");
 
-    const filters = await ytsr.getFilters(searchTerms);
+    const search = await youtube.search.list({
+      access_token: process.env.YOUTUBE_API_KEY,
+      part: ["id", "snippet"],
+      q: query,
+    });
+
+    if (!search.data.items)
+      throw new AppError("Search did not retrieve any results");
     let url = "";
-    if (filters) {
-      const filteredUrl = filters?.get("Type")?.get("Video")?.url;
-      if (!filteredUrl) throw new AppError("Could not build filter url");
-      const { items } = await ytsr(filteredUrl, { limit: 10 });
-      for (const item of items) {
-        if (item.type === `video`) {
-          url = item.url;
-          break;
-        }
+    for (const item of search.data.items) {
+      if (item.id?.kind === "youtube#video" && item.id?.videoId) {
+        url = `https://youtu.be/${item.id.videoId}`;
+        break;
       }
     }
 
-    if (!url) throw new AppError("Could not find song " + searchTerms);
+    if (!url) throw new AppError("Could not find song " + query);
 
-    await redis.set(searchTerms, url);
+    await redis.set(query, url);
     return url;
   }
 
