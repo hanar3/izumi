@@ -17,7 +17,7 @@ export class Pause implements BaseCommand {
   async execute(): Promise<any> {
     this.player = this.message.client.manager.get(this.message.guild?.id || "");
     if (!this.player)
-      throw new AppError("I am currently not playing anything!w");
+      throw new AppError("I am currently not playing anything!");
 
     const channel = this.message.member?.voice.channel;
     if (!channel)

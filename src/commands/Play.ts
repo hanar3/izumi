@@ -81,7 +81,7 @@ export class PlayCommand implements BaseCommand {
         let valid = false;
         do {
           const collected = await this.collectSelection();
-          const first = collected?.first?.()?.content ?? "";
+          const first = collected?.first()?.content ?? "";
 
           if (first.toLowerCase() === "end") {
             if (!this.player.queue.current) this.player.destroy();
