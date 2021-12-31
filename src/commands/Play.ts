@@ -37,6 +37,8 @@ export class PlayCommand implements BaseCommand {
         throw res.exception;
       }
     } catch (err) {
+      if (!(err instanceof Error)) return;
+
       return this.message.reply(
         `there was an error while searching: ${err.message}`
       );

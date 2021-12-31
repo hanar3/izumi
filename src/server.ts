@@ -62,7 +62,7 @@ client.manager = new Manager({
     }
     const embed = new MessageEmbed()
       .setThumbnail(
-        `https://img.youtube.com/vi/${player.queue.current.identifier}/mqdefault.jpg`
+        `https://img.youtube.com/vi/${player?.queue?.current?.identifier}/mqdefault.jpg`
       )
       .setURL(player?.queue?.current?.uri ?? "")
       .setTitle(`**${player.queue?.current?.title}**`)
