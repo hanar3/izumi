@@ -8,6 +8,7 @@ import { AppError } from "../error/AppError";
 import { InvalidArgsError } from "../error/InvalidArgsError";
 import { Stop } from "../commands/Stop";
 import { Skip } from "../commands/Skip";
+import { Shuffle } from "../commands/Shuffle";
 interface Constructable<T extends BaseCommand> {
   command: string;
   aliases: string[];
@@ -18,7 +19,7 @@ export class CommandManager {
   commands: Collection<string, Constructable<BaseCommand>> = new Collection();
 
   constructor() {
-    const commands = [PlayCommand, Pause, Resume, Stop, Skip];
+    const commands = [PlayCommand, Pause, Resume, Stop, Skip, Shuffle];
     for (const command of commands) {
       this.commands.set(command.command, command);
     }

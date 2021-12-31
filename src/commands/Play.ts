@@ -18,11 +18,6 @@ export class PlayCommand implements BaseCommand {
   async execute() {
     const channel = this.message.member?.voice.channel;
     if (!channel) throw new AppError("Please join a voice channel first");
-    if (channel.id !== this.player.voiceChannel) {
-      throw new AppError(
-        "You need to be in my voice channel to use this command!"
-      );
-    }
 
     if (!this.args.length) throw new InvalidArgsError(PlayCommand.usage);
 

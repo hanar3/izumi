@@ -1,5 +1,11 @@
 import "dotenv/config";
-import { Client, Intents, Message, TextChannel } from "discord.js";
+import {
+  Client,
+  Intents,
+  Message,
+  MessageEmbed,
+  TextChannel,
+} from "discord.js";
 import { Manager } from "erela.js";
 import { redis } from "./utils/redis";
 import { CommandManager } from "./managers/CommandManager";
@@ -55,7 +61,17 @@ client.manager = new Manager({
     if (!textChannel) {
       return;
     }
-    textChannel.send(`Started playing ${track.title}`);
+    const embed = new MessageEmbed()
+      .setThumbnail(
+        `https://img.youtube.com/vi/${player.queue.current.identifier}/mqdefault.jpg`
+      )
+      .setURL(player?.queue?.current?.uri ?? "")
+      .setTitle(`**${player.queue?.current?.title}**`)
+      .addField(` Duration: `, `\`${player.queue?.current?.duration}\``, true)
+      .addField(`Song By: `, `\`${player.queue?.current?.author}\``, true)
+      .addField(` Queue length: `, `\`${player.queue.length} Songs\``, true)
+      .setFooter(`Requested by: ${player.queue.current?.requester}`);
+    textChannel.send({ embeds: [embed] });
   })
   .on("queueEnd", (player) => {
     if (!player.textChannel) {
