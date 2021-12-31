@@ -23,6 +23,12 @@ export class Stop implements BaseCommand {
     const channel = this.message.member?.voice.channel;
     if (!channel)
       throw new AppError("Please join a voice channel to use this command");
+
+    if (channel.id !== this.player.voiceChannel) {
+      throw new AppError(
+        "You need to be in my voice channel to use this command!"
+      );
+    }
     this.player.stop();
     this.player.queue.clear();
     this.player.destroy();
