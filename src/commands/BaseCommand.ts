@@ -5,5 +5,5 @@ export abstract class BaseCommand {
   static aliases: string[];
   static description: string;
   manager: CommandManager;
-  abstract execute(): Promise<void>;
+  abstract execute(): Promise<any>;
 }

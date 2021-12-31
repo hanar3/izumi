@@ -1,15 +1,10 @@
-import { VoiceConnection } from "@discordjs/voice";
 import { Message } from "discord.js";
-import { Track } from "../utils/Track";
-import { BaseCommand } from "./BaseCommand";
-import { connectToChannel } from "../utils/connectToChannel";
-
-import MusicPlayer from "../utils/MusicPlayer";
+import { Player } from "erela.js";
 import { AppError } from "../error/AppError";
 import { InvalidArgsError } from "../error/InvalidArgsError";
 import { CommandManager } from "../managers/CommandManager";
-import { redis } from "../utils/redis";
-import { youtube } from "../utils/youtube";
+import { BaseCommand } from "./BaseCommand";
+
 export class PlayCommand implements BaseCommand {
   static command = "play";
   static aliases = ["p", "pl"];
@@ -17,94 +12,123 @@ export class PlayCommand implements BaseCommand {
   static description = "Plays the specified song";
 
   manager: CommandManager;
-
+  player: Player;
   constructor(private message: Message, private args: string[]) {}
 
   async execute() {
+    const channel = this.message.member?.voice.channel;
+    if (!channel) throw new AppError("Please join a voice channel first");
     if (!this.args.length) throw new InvalidArgsError(PlayCommand.usage);
 
-    await this.enqueueSong();
-    const connection = await this.joinVoiceChannel();
-    MusicPlayer.setVoiceConnection(connection);
-    MusicPlayer.subscribeVoiceConnection();
-  }
-
-  private async joinVoiceChannel(): Promise<VoiceConnection> {
-    const channel = this.message.member?.voice.channel;
-
-    if (!channel) {
-      // Disallow playing a song if user is not currently on a voice channel
-      MusicPlayer.stop();
-      throw new AppError("Please join a voice channel first");
-    }
-
-    const connection = await connectToChannel(channel);
-
-    return connection;
-  }
-
-  private async search() {
-    const query = this.args.join(" ");
-    const cachedURL = await redis.get(query);
-
-    if (cachedURL) return cachedURL;
-
-    this.message.reply("Searching for song...");
-
-    const search = await youtube.search.list({
-      access_token: process.env.YOUTUBE_API_KEY,
-      part: ["id"],
-      q: query,
+    this.player = this.message.client.manager.create({
+      guild: this.message.guild?.id || "",
+      voiceChannel: channel.id,
+      textChannel: this.message.channel.id,
     });
 
-    if (!search.data.items)
-      throw new AppError("Search did not retrieve any results");
-    let url = "";
-    for (const item of search.data.items) {
-      if (item.id?.kind === "youtube#video" && item.id?.videoId) {
-        url = `https://youtu.be/${item.id.videoId}`;
-        break;
+    if (this.player.state !== "CONNECTED") this.player.connect();
+    const search = this.args.join(" ");
+    let res;
+    try {
+      res = await this.player.search(search, this.message.author);
+      if (res.loadType === "LOAD_FAILED") {
+        if (!this.player.queue.current) this.player.destroy();
+        throw res.exception;
       }
+    } catch (err) {
+      return this.message.reply(
+        `there was an error while searching: ${err.message}`
+      );
     }
 
-    if (!url) throw new AppError("Could not find song " + query);
+    switch (res.loadType) {
+      case "NO_MATCHES":
+        if (!this.player.queue.current) this.player.destroy();
+        return this.message.reply("there were no results found.");
+      case "TRACK_LOADED":
+        this.player.queue.add(res.tracks[0]);
 
-    await redis.set(query, url);
-    return url;
-  }
+        if (
+          !this.player.playing &&
+          !this.player.paused &&
+          !this.player.queue.size
+        )
+          this.player.play();
+        return this.message.reply(`enqueuing \`${res.tracks[0].title}\`.`);
+      case "PLAYLIST_LOADED":
+        this.player.queue.add(res.tracks);
 
-  private async enqueueSong() {
-    let url = this.args.join(" ");
-    if (!url.startsWith("http")) {
-      // If it`s not a link, it`s probably a song title, so search for the link
-      url = await this.search();
+        if (
+          !this.player.playing &&
+          !this.player.paused &&
+          this.player.queue.totalSize === res.tracks.length
+        )
+          this.player.play();
+        return this.message.reply(
+          `enqueuing playlist \`${res?.playlist?.name}\` with ${res.tracks.length} tracks.`
+        );
+      case "SEARCH_RESULT":
+        let max = 5;
+        if (res.tracks.length < max) max = res.tracks.length;
+
+        const results = res.tracks
+          .slice(0, max)
+          .map((track, index) => `${++index} - \`${track.title}\``)
+          .join("\n");
+
+        this.message.channel.send(results);
+
+        let valid = false;
+        do {
+          const collected = await this.collectSelection();
+          const first = collected?.first?.()?.content ?? "";
+
+          if (first.toLowerCase() === "end") {
+            if (!this.player.queue.current) this.player.destroy();
+            this.message.channel.send("Cancelled selection.");
+            break;
+          }
+
+          const index = Number(first) - 1;
+          if (index < 0 || index > max - 1) {
+            this.message.reply(
+              `the number you provided too small or too big (1-${max}).`
+            );
+            continue;
+          }
+
+          if (isNaN(index)) {
+            this.message.reply(`Please provide a valid number (1-${max})`);
+            continue;
+          }
+
+          valid = true;
+          const track = res.tracks[index];
+          this.player.queue.add(track);
+          if (
+            !this.player.playing &&
+            !this.player.paused &&
+            !this.player.queue.size
+          )
+            this.player.play();
+          return this.message.reply(`enqueuing \`${track.title}\`.`);
+        } while (!valid);
     }
-
-    const track = await this.createTrack(url);
-    MusicPlayer.enqueue(track);
   }
 
-  async createTrack(url: string) {
-    const track = await Track.from(url, {
-      onStart: async () => {
-        await this.message.reply(`Started playing ${track.title}`);
-      },
-      onEnqueue: async (queue: Track[]) => {
-        await this.message.reply(
-          `Queuing ${track.title} at position ${queue.length - 1}`
-        );
-      },
+  private async collectSelection() {
+    try {
+      const collected = await this.message.channel.awaitMessages({
+        filter: (m) => m.author.id === this.message.author.id,
+        max: 1,
+        time: 30e3,
+        errors: ["time"],
+      });
 
-      onFinish: async () => {
-        console.log("Finished playing song");
-      },
-
-      onError: async (error) => {
-        await this.message.reply(
-          `Something went wrong trying to play ${track.title}`
-        );
-      },
-    });
-    return track;
+      return collected;
+    } catch (e) {
+      if (!this.player.queue.current) this.player.destroy();
+      this.message.reply("you didn't provide a selection.");
+    }
   }
 }
