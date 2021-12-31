@@ -7,7 +7,6 @@ import {
   TextChannel,
 } from "discord.js";
 import { Manager } from "erela.js";
-import { redis } from "./utils/redis";
 import { CommandManager } from "./managers/CommandManager";
 import Spotify from "erela.js-spotify";
 
@@ -92,7 +91,6 @@ client.manager = new Manager({
   });
 
 client.once("ready", async () => {
-  await redis.connect();
   client.user?.setPresence({
     activities: [
       {
