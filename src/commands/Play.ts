@@ -8,7 +8,7 @@ import { BaseCommand } from "./BaseCommand";
 export class PlayCommand implements BaseCommand {
   static command = "play";
   static aliases = ["p", "pl"];
-  static usage = "`!play <url>`";
+  static usage = "`-play <url>`";
   static description = "Plays the specified song";
 
   manager: CommandManager;
