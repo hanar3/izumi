@@ -61,16 +61,13 @@ client.manager = new Manager({
       return;
     }
     const embed = new MessageEmbed()
-      .setThumbnail(
-        `https://img.youtube.com/vi/${player?.queue?.current?.identifier}/mqdefault.jpg`
-      )
-      .setURL(player?.queue?.current?.uri ?? "")
-      .setTitle(`**${player.queue?.current?.title}**`)
-      .addField(` Duration: `, `\`${player.queue?.current?.duration}\``, true)
-      .addField(`Song By: `, `\`${player.queue?.current?.author}\``, true)
-      .addField(` Queue length: `, `\`${player.queue.length} Songs\``, true)
-      .setFooter(`Requested by: ${player.queue.current?.requester}`);
-    textChannel.send({ embeds: [embed] });
+      .setTitle("**Now playing**")
+      .setDescription(
+        `[**${player.queue?.current?.title}**](${player?.queue?.current?.uri}) [${player.queue.current?.requester}]`
+      );
+    textChannel.send({
+      embeds: [embed],
+    });
   })
   .on("queueEnd", (player) => {
     if (!player.textChannel) {

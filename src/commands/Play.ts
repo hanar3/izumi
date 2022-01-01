@@ -40,14 +40,14 @@ export class PlayCommand implements BaseCommand {
       if (!(err instanceof Error)) return;
 
       return this.message.reply(
-        `there was an error while searching: ${err.message}`
+        `There was an error while searching: ${err.message}`
       );
     }
 
     switch (res.loadType) {
       case "NO_MATCHES":
         if (!this.player.queue.current) this.player.destroy();
-        return this.message.reply("there were no results found.");
+        return this.message.reply("There were no results found.");
       case "TRACK_LOADED":
         this.player.queue.add(res.tracks[0]);
 
@@ -55,9 +55,10 @@ export class PlayCommand implements BaseCommand {
           !this.player.playing &&
           !this.player.paused &&
           !this.player.queue.size
-        )
+        ) {
           this.player.play();
-        return this.message.reply(`enqueuing \`${res.tracks[0].title}\`.`);
+        }
+        return this.message.react(`✅`);
       case "PLAYLIST_LOADED":
         this.player.queue.add(res.tracks);
 
@@ -67,9 +68,7 @@ export class PlayCommand implements BaseCommand {
           this.player.queue.totalSize === res.tracks.length
         )
           this.player.play();
-        return this.message.reply(
-          `enqueuing playlist \`${res?.playlist?.name}\` with ${res.tracks.length} tracks.`
-        );
+        return this.message.react(`✅`);
       case "SEARCH_RESULT":
         let max = 5;
         if (res.tracks.length < max) max = res.tracks.length;
@@ -114,7 +113,7 @@ export class PlayCommand implements BaseCommand {
             !this.player.queue.size
           )
             this.player.play();
-          return this.message.reply(`enqueuing \`${track.title}\`.`);
+          return this.message.react(`✅`);
         } while (!valid);
     }
   }
