@@ -11,6 +11,8 @@ import { Skip } from "../commands/Skip";
 import { Shuffle } from "../commands/Shuffle";
 import { Help } from "../commands/Help";
 import { Queue } from "../commands/Queue";
+import { Jump } from "../commands/Jump";
+import { QueueRemove } from "../commands/QueueRemove";
 interface Constructable<T extends BaseCommand> {
   command: string;
   aliases: string[];
@@ -30,8 +32,10 @@ export class CommandManager {
       Stop,
       Skip,
       Shuffle,
-      Help,
       Queue,
+      Jump,
+      QueueRemove,
+      Help,
     ];
     for (const command of commands) {
       this.commands.set(command.command, command);
