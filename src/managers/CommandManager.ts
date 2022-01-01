@@ -10,6 +10,7 @@ import { Stop } from "../commands/Stop";
 import { Skip } from "../commands/Skip";
 import { Shuffle } from "../commands/Shuffle";
 import { Help } from "../commands/Help";
+import { Queue } from "../commands/Queue";
 interface Constructable<T extends BaseCommand> {
   command: string;
   aliases: string[];
@@ -22,7 +23,16 @@ export class CommandManager {
   commands: Collection<string, Constructable<BaseCommand>> = new Collection();
 
   constructor() {
-    const commands = [PlayCommand, Pause, Resume, Stop, Skip, Shuffle, Help];
+    const commands = [
+      PlayCommand,
+      Pause,
+      Resume,
+      Stop,
+      Skip,
+      Shuffle,
+      Help,
+      Queue,
+    ];
     for (const command of commands) {
       this.commands.set(command.command, command);
     }
