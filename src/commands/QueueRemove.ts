@@ -24,7 +24,6 @@ export class QueueRemove implements BaseCommand {
 
     if (this.player.queue.size === 0) {
       this.message.reply("The queue is empty.");
-      this.player.destroy();
     }
 
     const [index] = this.args;

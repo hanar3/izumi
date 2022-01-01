@@ -21,7 +21,6 @@ export class Queue implements BaseCommand {
 
     if (this.player.queue.size === 0) {
       this.message.reply("The queue is empty.");
-      this.player.destroy();
     }
     const LIMIT_PER_PAGE = 10;
     const queue = this.player.queue
