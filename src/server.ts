@@ -83,8 +83,6 @@ client.manager = new Manager({
       return;
     }
     textChannel.send(`Queue has ended`);
-
-    player.destroy();
   });
 
 client.once("ready", async () => {

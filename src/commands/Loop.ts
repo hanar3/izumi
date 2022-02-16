@@ -5,10 +5,11 @@ import { CommandManager } from "../managers/CommandManager";
 import { BaseCommand } from "./BaseCommand";
 
 export class Pause implements BaseCommand {
-  static command = "pause";
+  static command = "loop";
   static aliases = [];
-  static usage = "`-pause`";
-  static description = "Pauses the current song";
+  static usage = "`-loop`";
+  static description = "Loops the current song";
+
   manager: CommandManager;
   player: Player | undefined;
 
@@ -27,8 +28,8 @@ export class Pause implements BaseCommand {
         "You need to be in my voice channel to use this command!"
       );
     }
-    if (this.player.playing) {
-      this.player.pause(true);
-    }
+
+    this.player.setQueueRepeat(!this.player.queueRepeat);
+    this.message.reply("🔁");
   }
 }
